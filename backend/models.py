@@ -1,16 +1,21 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from blog.database import Base
+from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from .database import Base
 from sqlalchemy.orm import relationship
 
-class Blog(Base):
-    __tablename__ = "blogs"
+class MealLog(Base):
+    __tablename__ = "meal_logs"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String)
-    body = Column(String)
+    food = Column(String)
+    servings = Column(Float)
+    calories = Column(Float)
+    protein = Column(Float)
+    carbs = Column(Float)
+    fiber = Column(Float)
+    fat = Column(Float)
     user_id = Column(Integer, ForeignKey("users.id"))
 
-    creator = relationship("User", back_populates="blogs")
+    user = relationship("User", back_populates="meal_logs")
 
 
 class User(Base):
@@ -21,4 +26,4 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     password = Column(String)
 
-    blogs = relationship("Blog", back_populates="creator")
+    meal_logs = relationship("MealLog", back_populates="user")

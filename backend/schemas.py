@@ -2,29 +2,37 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 
-class BlogBase(BaseModel):
-    title: str
-    body: str
+class MealLogBase(BaseModel):
+    food: str
+    servings: float
+    calories: float
+    protein: float
+    carbs: float
+    fiber: float
+    fat: float
 
-class Blog(BlogBase):
+class MealLog(MealLogBase):
     class Config:
         orm_mode = True
 
 class User(BaseModel):
-    name:str
-    email:str
-    password:str
+    name: str
+    email: str
+    password: str
 
 class ShowUser(BaseModel):
-    name:str
-    email:str
-    blogs: List[Blog] = []
+    name: str
+    email: str
 
-
-class ShowBlog(BaseModel):
-    title: str
-    body: str
-    creator: ShowUser
+class ShowMealLog(BaseModel):
+    food: str
+    servings: float
+    calories: float
+    protein: float
+    carbs: float
+    fiber: float
+    fat: float
+    user: ShowUser
 
     class Config:
         orm_mode = True
@@ -32,7 +40,6 @@ class ShowBlog(BaseModel):
 class Login(BaseModel):
     username: str
     password: str
-
 
 class Token(BaseModel):
     access_token: str
