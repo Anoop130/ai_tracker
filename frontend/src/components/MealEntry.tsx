@@ -1,7 +1,12 @@
 import { useState } from "react";
+import { apiService } from "../services/api";
 import InputField from "./InputField";
 
-export default function MealEntry() {
+interface MealEntryProps {
+  onMealAdded?: () => void;
+}
+
+export default function MealEntry({ onMealAdded }: MealEntryProps) {
   const [foodEntry, setFoodEntry] = useState({
     food: "",
     servings: "",
@@ -12,6 +17,8 @@ export default function MealEntry() {
     fat: ""
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFoodEntry(prev => ({
@@ -20,19 +27,46 @@ export default function MealEntry() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Food entry:", foodEntry);
-    alert("Food logged successfully!");
-    setFoodEntry({
-      food: "",
-      servings: "",
-      calories: "",
-      protein: "",
-      carbs: "",
-      fiber: "",
-      fat: ""
-    });
+    console.log(" Form submitted with data:", foodEntry);
+    setLoading(true);
+    
+    try {
+      const mealLogData = {
+        food: foodEntry.food,
+        servings: parseFloat(foodEntry.servings),
+        calories: parseFloat(foodEntry.calories),
+        protein: parseFloat(foodEntry.protein),
+        carbs: parseFloat(foodEntry.carbs),
+        fiber: parseFloat(foodEntry.fiber),
+        fat: parseFloat(foodEntry.fat)
+      };
+
+      console.log("🔄 Calling API service with:", mealLogData);
+      await apiService.createMealLog(mealLogData);
+      
+      // Reset form
+      setFoodEntry({
+        food: "",
+        servings: "",
+        calories: "",
+        protein: "",
+        carbs: "",
+        fiber: "",
+        fat: ""
+      });
+      
+      alert("Food logged successfully!");
+      
+      // Notify parent component
+      onMealAdded?.();
+    } catch (error) {
+      console.error('Error logging food:', error);
+      alert("Failed to log food. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Define the form fields configuration
@@ -131,9 +165,10 @@ export default function MealEntry() {
 
           <button
             type="submit"
-            className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+            disabled={loading}
+            className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors disabled:opacity-50"
           >
-            Log Food
+            {loading ? "Logging..." : "Log Food"}
           </button>
         </form>
       </div>
